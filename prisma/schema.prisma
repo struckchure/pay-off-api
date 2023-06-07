@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  CUSTOMER   @map("CUSTOMER")
+  MERCHANT   @map("MERCHANT")
+  STAFF      @map("STAFF")
+  ADMIN      @map("ADMIN")
+  SUPER_USER @map("SUPER_USER")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  firstName String   @db.Char(100)
+  lastName  String   @db.Char(100)
+  email     String   @db.Char(100)
+  password  String
+  userType  UserType
+  isActive  Boolean  @default(true)
+
+  Wallet              Wallet[]      @ignore
+  TransactionFromUser Transaction[] @relation("fromUser") @ignore
+  TransactionToUser   Transaction[] @relation("toUser") @ignore
+  Biometric           Biometric?
+
+  @@map("users")
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: NoAction)
+
+  balance  Decimal? @default(0)
+  isActive Boolean? @default(true)
+
+  @@map("wallets")
+}
+
+enum TransactionType {
+  CREDIT @map("CREDIT")
+  DEBIT  @map("DEBIT")
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  fromUserId String?
+  fromUser   User?   @relation("fromUser", fields: [fromUserId], references: [id], onDelete: NoAction)
+  toUserId   String?
+  toUser     User?   @relation("toUser", fields: [toUserId], references: [id], onDelete: NoAction)
+
+  amount          Decimal
+  transactionType TransactionType
+  description     String
+
+  @@map("transactions")
+}
+
+enum BiometricType {
+  FINGERPRINT @map("FINGERPRINT")
+}
+
+model Biometric {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId        String        @unique
+  user          User          @relation(fields: [userId], references: [id], onDelete: NoAction)
+  biometricType BiometricType
+  biometricUrl  String
+
+  @@map("biometrics")
+}
