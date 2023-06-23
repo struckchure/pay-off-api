@@ -33,7 +33,7 @@ model User {
   Wallet              Wallet[]      @ignore
   TransactionFromUser Transaction[] @relation("fromUser") @ignore
   TransactionToUser   Transaction[] @relation("toUser") @ignore
-  Biometric           Biometric?
+  Biometric           Biometric?    @ignore
 
   @@map("users")
 }
