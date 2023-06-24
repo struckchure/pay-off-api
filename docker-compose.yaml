@@ -12,5 +12,17 @@ services:
     ports:
       - 5432:5432
 
+  redis:
+    image: redis:alpine
+    environment:
+      - name=value
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_volume:/usr/local/etc/redis
+
 volumes:
   postgres_volume:
+  redis_volume:
+
+
