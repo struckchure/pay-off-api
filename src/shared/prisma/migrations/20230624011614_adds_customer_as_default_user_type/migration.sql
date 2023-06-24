@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "users" ALTER COLUMN "userType" SET DEFAULT 'CUSTOMER';
