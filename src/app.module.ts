@@ -4,8 +4,9 @@ import { JwtModule } from "@nestjs/jwt";
 import "dotenv/config";
 
 import { AuthModule } from "@/modules/auth/auth.module";
-import { PrismaModule } from "@/shared/prisma/prisma.module";
+import { BiometricsModule } from "@/modules/biometrics/biometrics.module";
 import { UserModule } from "@/modules/user/user.module";
+import { PrismaModule } from "@/shared/prisma/prisma.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { UserModule } from "@/modules/user/user.module";
     PrismaModule,
     UserModule,
     AuthModule,
+    BiometricsModule,
   ],
 })
 export class AppModule {}
