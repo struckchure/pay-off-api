@@ -88,5 +88,6 @@ model Biometric {
   biometricType BiometricType
   biometricUrl  String
 
+  @@unique([userId, biometricType])
   @@map("biometrics")
 }
