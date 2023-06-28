@@ -1,12 +1,12 @@
-import { removeObjectValueByKey } from "@/shared/utils";
 import { Injectable, NotFoundException } from "@nestjs/common";
 
-import { UserDAO } from "../dao/user.dao";
 import {
   IAuthGetProfile,
   IAuthUpdateProfile,
-} from "../../auth/interfaces/auth.interface";
-import { IUser } from "../interfaces/user.interface";
+} from "@/modules/auth/interfaces/auth.interface";
+import { UserDAO } from "@/modules/user/dao/user.dao";
+import { IUser } from "@/modules/user/interfaces/user.interface";
+import { removeObjectValueByKey } from "@/shared/utils";
 
 @Injectable()
 export class UserService {
