@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   CallHandler,
   ExecutionContext,
   Injectable,
@@ -7,33 +8,52 @@ import {
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 
+import { BiometricsDAO } from "@/modules/biometrics/dao/biometrics.dao";
 import { BiometricType } from "@/modules/biometrics/interfaces/biometrics.interface";
 import { BiometricsService } from "@/modules/biometrics/services/biometrics.service";
+import { MediaService } from "@/shared/media/media.service";
+import { TokenService } from "@/shared/token/token.service";
 
 @Injectable()
 export class BiometricsInterceptor implements NestInterceptor {
-  constructor(private biometricsService: BiometricsService) {}
+  constructor(
+    private biometricsDAO: BiometricsDAO,
+    private biometricsService: BiometricsService,
+    private mediaService: MediaService,
+    private tokenService: TokenService,
+  ) {}
 
   async intercept(
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Promise<Observable<any>> {
-    const req = context.switchToHttp().getRequest<Request>();
-    const files = req.files as unknown as {
-      sample: Express.Multer.File[];
-      target: Express.Multer.File[];
-    };
+    const request = context.switchToHttp().getRequest<Request>();
 
-    const sample = files.sample[0];
-    const target = files.target[0];
+    const sample = request.file as Express.Multer.File;
 
-    const { status } = await this.biometricsService.biometricsVerify({
-      biometricType: BiometricType.FINGERPRINT,
-      sample,
-      target,
-    });
+    if (!sample) {
+      throw new BadRequestException("sample must be specified");
+    }
 
-    if (!status) throw new UnauthorizedException("User biometric failed");
+    const token = request.headers["authorization"].split(" ")[1];
+    const { id: userId } = await this.tokenService.verifyAccessToken(token);
+
+    const biometric = await this.biometricsDAO.biometricsGet({ userId });
+
+    const target = await this.mediaService.downloadToFile(
+      biometric.biometricUrl,
+    );
+
+    const { status: isBiometricsValid } =
+      await this.biometricsService.biometricsVerify({
+        biometricType: BiometricType.FINGERPRINT,
+        sample,
+        target,
+      });
+
+    if (!isBiometricsValid) {
+      throw new UnauthorizedException("user biometric failed");
+    }
 
     return next.handle();
   }
