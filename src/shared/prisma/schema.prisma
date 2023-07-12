@@ -30,9 +30,9 @@ model User {
   userType  UserType @default(CUSTOMER)
   isActive  Boolean  @default(true)
 
-  Wallet      Wallet[]      @ignore
-  Biometric   Biometric?    @ignore
-  Transaction Transaction[] @ignore
+  Wallet      Wallet[]
+  Biometric   Biometric?
+  Transaction Transaction[]
 
   @@map("users")
 }
@@ -66,7 +66,7 @@ model Transaction {
 
   amount          Decimal
   transactionType TransactionType
-  description     String
+  description     String?
   meta            Json?
 
   @@map("transactions")
