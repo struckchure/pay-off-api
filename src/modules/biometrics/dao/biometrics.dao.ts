@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 
 import {
-  IBiometricsCreate,
-  IBiometricsDelete,
-  IBiometricsGet,
-  IBiometricsList,
-  IBiometricsUpdate,
+  BiometricsCreateArgs,
+  BiometricsDeleteArgs,
+  BiometricsGetArgs,
+  BiometricsListArgs,
+  BiometricsUpdateArgs,
 } from "@/modules/biometrics/interfaces/biometrics.interface";
 import { PrismaService } from "@/shared/prisma/prisma.service";
 
@@ -13,7 +13,7 @@ import { PrismaService } from "@/shared/prisma/prisma.service";
 export class BiometricsDAO {
   constructor(private prismaService: PrismaService) {}
 
-  async biometricsList(biometricsListArgs: IBiometricsList) {
+  async biometricsList(biometricsListArgs: BiometricsListArgs) {
     return await this.prismaService.biometric.findMany({
       where: {
         ...(biometricsListArgs.biometricType
@@ -32,7 +32,7 @@ export class BiometricsDAO {
     });
   }
 
-  async biometricsCreate(biometricsCreateArgs: IBiometricsCreate) {
+  async biometricsCreate(biometricsCreateArgs: BiometricsCreateArgs) {
     const biometricExists = !(await this.prismaService.biometric.findFirst({
       where: {
         userId: biometricsCreateArgs.userId,
@@ -49,7 +49,7 @@ export class BiometricsDAO {
     });
   }
 
-  async biometricsGet(biometricsGetArgs: IBiometricsGet) {
+  async biometricsGet(biometricsGetArgs: BiometricsGetArgs) {
     return await this.prismaService.biometric.findFirst({
       where: {
         ...(biometricsGetArgs.id ? { id: biometricsGetArgs.id } : {}),
@@ -61,8 +61,8 @@ export class BiometricsDAO {
   }
 
   async biometricsUpdate(
-    biometricsGetArgs: IBiometricsGet,
-    biometricsUpdateArgs: IBiometricsUpdate,
+    biometricsGetArgs: BiometricsGetArgs,
+    biometricsUpdateArgs: BiometricsUpdateArgs,
   ) {
     return await this.prismaService.biometric.update({
       where: {
@@ -75,7 +75,7 @@ export class BiometricsDAO {
     });
   }
 
-  async biometricsDelete(biometricsDeleteArgs: IBiometricsDelete) {
+  async biometricsDelete(biometricsDeleteArgs: BiometricsDeleteArgs) {
     const biometricExists = !!(await this.biometricsGet(biometricsDeleteArgs));
     if (!biometricExists) throw new Error("Biometrics not found");
 
