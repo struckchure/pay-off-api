@@ -28,11 +28,8 @@ lerna-debug.log*
 *.sublime-workspace
 
 # IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+.vscode/
 
 .env
-prisma/migrations/migration_lock.toml
+yarn.lock
+package-lock.json
