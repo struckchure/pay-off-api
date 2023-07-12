@@ -6,7 +6,9 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import axios from "axios";
 import { randomUUID } from "crypto";
+import { Readable } from "stream";
 
 @Injectable()
 export class MediaService {
@@ -59,5 +61,26 @@ export class MediaService {
     });
 
     return { url };
+  }
+
+  async downloadToFile(key: string, expiresIn = 60 * 5) {
+    const { url: fileUrl } = await this.download(key, expiresIn);
+
+    const response = await axios.get(fileUrl, { responseType: "arraybuffer" });
+
+    const file: Express.Multer.File = {
+      fieldname: "file",
+      originalname: key,
+      mimetype: response.headers["content-type"] || "",
+      size: response.data.length,
+      buffer: Buffer.from(response.data),
+      encoding: "",
+      stream: new Readable(),
+      destination: "",
+      filename: "",
+      path: "",
+    };
+
+    return file;
   }
 }
