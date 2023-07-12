@@ -15,7 +15,7 @@ import {
   IAuthRegister,
   IAuthTokens,
 } from "@/modules/auth/interfaces/auth.interface";
-import { IUser } from "@/modules/user/interfaces/user.interface";
+import { User } from "@/modules/user/interfaces/user.interface";
 
 @Injectable()
 export class AuthService {
@@ -28,7 +28,7 @@ export class AuthService {
 
   async authRegister(
     authRegisterArgs: IAuthRegister,
-  ): Promise<Omit<IUser, "password"> & { tokens: IAuthTokens }> {
+  ): Promise<Omit<User, "password"> & { tokens: IAuthTokens }> {
     const userExists = !!(await this.userDAO.userGet({
       email: authRegisterArgs.email,
     }));
@@ -42,7 +42,7 @@ export class AuthService {
     const user = removeObjectValueByKey(
       await this.userDAO.userCreate(authRegisterArgs),
       "password",
-    ) as unknown as IUser;
+    ) as unknown as User;
 
     return {
       ...user,
@@ -52,7 +52,7 @@ export class AuthService {
 
   async authLogin(
     authLoginArgs: IAuthLogin,
-  ): Promise<Omit<IUser, "password"> & { tokens: IAuthTokens }> {
+  ): Promise<Omit<User, "password"> & { tokens: IAuthTokens }> {
     const user = await this.userDAO.userGet({
       email: authLoginArgs.email,
     });
@@ -66,8 +66,8 @@ export class AuthService {
       throw new UnauthorizedException("Invalid credentials");
 
     return {
-      ...(removeObjectValueByKey(user, "password") as unknown as IUser),
-      tokens: await this.tokenService.generateToken(user as IUser),
+      ...(removeObjectValueByKey(user, "password") as unknown as User),
+      tokens: await this.tokenService.generateToken(user as User),
     };
   }
 
@@ -83,7 +83,7 @@ export class AuthService {
       refreshToken,
     );
 
-    const user = (await this.userDAO.userGet({ id: userId })) as IUser;
+    const user = (await this.userDAO.userGet({ id: userId })) as User;
 
     await this.redisService.push(BLACKLISTED_TOKENS, refreshToken);
 

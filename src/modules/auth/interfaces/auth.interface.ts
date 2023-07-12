@@ -1,19 +1,19 @@
 import {
-  IUserCreate,
-  IUserGet,
-  IUserUpdate,
+  UserCreateArgs,
+  UserGetArgs,
+  UserUpdateArgs,
 } from "@/modules/user/interfaces/user.interface";
 
-export type IAuthRegister = IUserCreate;
+export type IAuthRegister = UserCreateArgs;
 
 export interface IAuthLogin {
   email: string;
   password: string;
 }
 
-export type IAuthGetProfile = Pick<IUserGet, "id">;
+export type IAuthGetProfile = Pick<UserGetArgs, "id">;
 
-export type IAuthUpdateProfile = IUserUpdate;
+export type IAuthUpdateProfile = UserUpdateArgs;
 
 export interface IAuthTokens {
   accessToken: string;

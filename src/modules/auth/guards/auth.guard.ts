@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 
-import { IUser } from "@/modules/user/interfaces/user.interface";
+import { User } from "@/modules/user/interfaces/user.interface";
 import { UserDAO } from "@/modules/user/dao/user.dao";
 
 @Injectable()
@@ -23,7 +23,7 @@ export class AuthGuard implements CanActivate {
     try {
       const payload = (await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_ACCESS_TOKEN_SECRET,
-      })) as IUser;
+      })) as User;
 
       const user = await this.userDAO.userGet({ id: payload.id });
       if (!user) throw new UnauthorizedException("Invalid auth token");
