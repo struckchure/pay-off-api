@@ -11,6 +11,7 @@ import {
   Req,
   UploadedFile,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
 import {
@@ -18,15 +19,16 @@ import {
   FileInterceptor,
 } from "@nestjs/platform-express";
 
+import { AuthGuard } from "@/modules/auth/guards/auth.guard";
 import {
   BiometricsCreateDTO,
   BiometricsUpdateDTO,
 } from "@/modules/biometrics/dto/biometrics.dto";
+import { BiometricType } from "@/modules/biometrics/interfaces/biometrics.interface";
 import { BiometricsService } from "@/modules/biometrics/services/biometrics.service";
-import { BiometricType } from "../interfaces/biometrics.interface";
 
 @Controller("biometrics")
-// @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
 export class BiometricsController {
   constructor(private biometricsService: BiometricsService) {}
 
