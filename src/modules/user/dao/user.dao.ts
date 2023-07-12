@@ -7,16 +7,16 @@ import {
   UserListArgs,
   UserUpdateArgs,
 } from "@/modules/user/interfaces/user.interface";
+import { PrismaService } from "@/shared/prisma/prisma.service";
 import { removeNullOrEmptyValues } from "@/shared/utils";
 import { Prisma } from "@prisma/client";
-import { PrismaService } from "@/shared/prisma/prisma.service";
 
 @Injectable()
 export class UserDAO {
   constructor(private prismaService: PrismaService) {}
 
   async userList(userListArgs: UserListArgs) {
-    const extraArgs: Prisma.UserWhereInput = removeNullOrEmptyValues({
+    const extraArgs = removeNullOrEmptyValues<Prisma.UserWhereInput>({
       isActive: userListArgs.isActive,
       userType: userListArgs.userType,
     });
@@ -66,7 +66,7 @@ export class UserDAO {
     });
   }
 
-  async userDelete(userDeleteArgs: UserDeleteArgs) {
+  async userDelete(userDeleteArgs: RequireAtLeastOne<UserDeleteArgs>) {
     await this.prismaService.user.delete({
       where: {
         ...(userDeleteArgs.id ? { id: userDeleteArgs.id } : {}),

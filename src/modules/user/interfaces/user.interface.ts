@@ -1,10 +1,4 @@
-export enum UserType {
-  CUSTOMER = "CUSTOMER",
-  MERCHANT = "MERCHANT",
-  STAFF = "STAFF",
-  ADMIN = "ADMIN",
-  SUPER_USER = "SUPER_USER",
-}
+import { UserType } from "@prisma/client";
 
 export interface User {
   id: string;
@@ -21,6 +15,7 @@ export interface UserListArgs {
   search?: string;
   skip?: number;
   take?: number;
+
   isActive?: boolean;
   userType?: UserType;
 }
