@@ -5,11 +5,18 @@ import { BiometricsController } from "@/modules/biometrics/controllers/biometric
 import { BiometricsDAO } from "@/modules/biometrics/dao/biometrics.dao";
 import { BiometricsService } from "@/modules/biometrics/services/biometrics.service";
 import { UserDAO } from "@/modules/user/dao/user.dao";
+import { BiometricsClient } from "@/shared/clients/biometrics";
 import { MediaService } from "@/shared/media/media.service";
 
 @Module({
   controllers: [BiometricsController],
-  providers: [BiometricsService, BiometricsDAO, UserDAO, MediaService],
+  providers: [
+    BiometricsService,
+    BiometricsDAO,
+    UserDAO,
+    MediaService,
+    BiometricsClient,
+  ],
   imports: [HttpModule],
 })
 export class BiometricsModule {}
