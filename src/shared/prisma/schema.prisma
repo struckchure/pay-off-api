@@ -30,10 +30,9 @@ model User {
   userType  UserType @default(CUSTOMER)
   isActive  Boolean  @default(true)
 
-  Wallet              Wallet[]      @ignore
-  TransactionFromUser Transaction[] @relation("fromUser") @ignore
-  TransactionToUser   Transaction[] @relation("toUser") @ignore
-  Biometric           Biometric?    @ignore
+  Wallet      Wallet[]      @ignore
+  Biometric   Biometric?    @ignore
+  Transaction Transaction[] @ignore
 
   @@map("users")
 }
@@ -62,14 +61,13 @@ model Transaction {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  fromUserId String?
-  fromUser   User?   @relation("fromUser", fields: [fromUserId], references: [id], onDelete: NoAction)
-  toUserId   String?
-  toUser     User?   @relation("toUser", fields: [toUserId], references: [id], onDelete: NoAction)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: NoAction)
 
   amount          Decimal
   transactionType TransactionType
   description     String
+  meta            Json?
 
   @@map("transactions")
 }
