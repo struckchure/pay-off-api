@@ -1,11 +1,18 @@
 ## PayOff API
 
-hello world
+The API utilizing biometrics for payout and transfer authorization enhances security and user experience by verifying unique physical or behavioral traits. Users initiate transactions, provide biometric data (e.g., fingerprints), which is verified against stored templates. Successful verification authorizes the transaction, ensuring only authorized individuals can complete payouts or transfers. This biometric authentication adds a secure layer and streamlines the user experience, reducing reliance on traditional authentication methods. Compliance with privacy regulations is crucial to protect sensitive biometric information.
 
 ## Installation
 
 ```bash
 $ yarn
+```
+
+## Setup Postgres and Localstack S3
+
+```bash
+$ docker compose up --force-recreate -d
+$ aws --endpoint-url=http://localhost:4566 s3 mb s3://payoff
 ```
 
 ## Running the app
