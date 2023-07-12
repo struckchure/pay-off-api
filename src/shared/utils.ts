@@ -5,7 +5,7 @@ interface AnyObject {
   [key: string]: any;
 }
 
-export function removeNullOrEmptyValues(obj: AnyObject): AnyObject {
+export function removeNullOrEmptyValues<T = AnyObject>(obj: T): T {
   /**
    * Author: ChatGPT
    */
@@ -24,22 +24,19 @@ export function removeNullOrEmptyValues(obj: AnyObject): AnyObject {
     }
   }
 
-  return result;
+  return result as T;
 }
 
-export function removeObjectValueByKey<T = object>(
-  obj: Record<string, T>,
-  key: string,
-): Record<string, T> {
+export function removeObjectValueByKey<T = AnyObject>(obj: T, key: string): T {
   /**
    * Author: ChatGPT
    */
 
-  const result: Record<string, T> = { ...obj };
+  const result: T = { ...obj };
 
   if (result.hasOwnProperty(key)) {
     delete result[key];
   }
 
-  return result;
+  return result as T;
 }
