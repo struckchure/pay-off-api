@@ -1,4 +1,3 @@
-import { HttpModule } from "@nestjs/axios";
 import { Module } from "@nestjs/common";
 
 import { TransactionController } from "@/modules/transaction/controllers/transaction.controller";
@@ -9,6 +8,5 @@ import { MediaService } from "@/shared/media/media.service";
 @Module({
   controllers: [TransactionController],
   providers: [MediaService, TransactionDAO, TransactionService],
-  imports: [HttpModule],
 })
 export class TransactionModule {}
