@@ -5,24 +5,34 @@ import "dotenv/config";
 
 import { AuthModule } from "@/modules/auth/auth.module";
 import { BiometricsModule } from "@/modules/biometrics/biometrics.module";
+import { TransactionModule } from "@/modules/transaction/transaction.module";
 import { UserModule } from "@/modules/user/user.module";
+import {
+  REDIS_HOST,
+  REDIS_PASSWORD,
+  REDIS_PORT,
+  REDIS_USERNAME,
+} from "@/shared/constants/env-vars";
 import { PrismaModule } from "@/shared/prisma/prisma.module";
+import { WalletModule } from "./modules/wallet/wallet.module";
 
 @Module({
   imports: [
     JwtModule.register({ global: true }),
     RedisModule.forRoot({
       config: {
-        host: process.env.REDIS_HOST,
-        password: process.env.REDIS_PASSWORD,
-        port: +process.env.REDIS_PORT,
-        username: process.env.REDIS_USERNAME,
+        host: REDIS_HOST,
+        password: REDIS_PASSWORD,
+        port: REDIS_PORT,
+        username: REDIS_USERNAME,
       },
     }),
-    PrismaModule,
-    UserModule,
     AuthModule,
     BiometricsModule,
+    PrismaModule,
+    TransactionModule,
+    UserModule,
+    WalletModule,
   ],
 })
 export class AppModule {}
