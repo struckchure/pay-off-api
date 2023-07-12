@@ -1,3 +1,4 @@
+import { HttpModule } from "@nestjs/axios";
 import { Module } from "@nestjs/common";
 
 import { BiometricsController } from "@/modules/biometrics/controllers/biometrics.controller";
@@ -9,5 +10,6 @@ import { MediaService } from "@/shared/media/media.service";
 @Module({
   controllers: [BiometricsController],
   providers: [BiometricsService, BiometricsDAO, UserDAO, MediaService],
+  imports: [HttpModule],
 })
 export class BiometricsModule {}
