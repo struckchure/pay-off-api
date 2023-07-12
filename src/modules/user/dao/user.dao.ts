@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 
 import {
-  IUserCreate,
-  IUserDelete,
-  IUserGet,
-  IUserList,
-  IUserUpdate,
+  UserCreateArgs,
+  UserDeleteArgs,
+  UserGetArgs,
+  UserListArgs,
+  UserUpdateArgs,
 } from "@/modules/user/interfaces/user.interface";
 import { removeNullOrEmptyValues } from "@/shared/utils";
 import { Prisma } from "@prisma/client";
@@ -15,7 +15,7 @@ import { PrismaService } from "@/shared/prisma/prisma.service";
 export class UserDAO {
   constructor(private prismaService: PrismaService) {}
 
-  async userList(userListArgs: IUserList) {
+  async userList(userListArgs: UserListArgs) {
     const extraArgs: Prisma.UserWhereInput = removeNullOrEmptyValues({
       isActive: userListArgs.isActive,
       userType: userListArgs.userType,
@@ -45,17 +45,17 @@ export class UserDAO {
     });
   }
 
-  async userCreate(userCreateArgs: IUserCreate) {
+  async userCreate(userCreateArgs: UserCreateArgs) {
     return await this.prismaService.user.create({ data: userCreateArgs });
   }
 
-  async userGet(userGetArgs: RequireAtLeastOne<IUserGet>) {
+  async userGet(userGetArgs: RequireAtLeastOne<UserGetArgs>) {
     return await this.prismaService.user.findFirst({ where: userGetArgs });
   }
 
   async userUpdate(
-    userGetArgs: RequireAtLeastOne<IUserGet>,
-    userUpdateArgs: IUserUpdate,
+    userGetArgs: RequireAtLeastOne<UserGetArgs>,
+    userUpdateArgs: UserUpdateArgs,
   ) {
     return await this.prismaService.user.update({
       where: {
@@ -66,7 +66,7 @@ export class UserDAO {
     });
   }
 
-  async userDelete(userDeleteArgs: IUserDelete) {
+  async userDelete(userDeleteArgs: UserDeleteArgs) {
     await this.prismaService.user.delete({
       where: {
         ...(userDeleteArgs.id ? { id: userDeleteArgs.id } : {}),

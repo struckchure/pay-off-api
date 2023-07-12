@@ -6,7 +6,7 @@ export enum UserType {
   SUPER_USER = "SUPER_USER",
 }
 
-export interface IUser {
+export interface User {
   id: string;
   createdAt: Date;
   updatedAt: Date;
@@ -17,7 +17,7 @@ export interface IUser {
   userType: UserType;
 }
 
-export interface IUserList {
+export interface UserListArgs {
   search?: string;
   skip?: number;
   take?: number;
@@ -25,7 +25,7 @@ export interface IUserList {
   userType?: UserType;
 }
 
-export interface IUserCreate {
+export interface UserCreateArgs {
   firstName: string;
   lastName: string;
   email: string;
@@ -33,13 +33,13 @@ export interface IUserCreate {
   userType?: UserType;
 }
 
-export interface IUserGet {
+export interface UserGetArgs {
   id?: string;
   email?: string;
 }
 
-export interface IUserUpdate extends Partial<IUserCreate> {
+export interface UserUpdateArgs extends Partial<UserCreateArgs> {
   isActive?: boolean;
 }
 
-export type IUserDelete = IUserGet;
+export type UserDeleteArgs = UserGetArgs;
