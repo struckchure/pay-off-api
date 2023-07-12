@@ -4,7 +4,7 @@ import { JwtService } from "@nestjs/jwt";
 import { BLACKLISTED_TOKENS } from "@/shared/constants";
 import { RedisService } from "@/shared/redis/redis.service";
 import { IAuthTokens } from "@/modules/auth/interfaces/auth.interface";
-import { IUser } from "@/modules/user/interfaces/user.interface";
+import { User } from "@/modules/user/interfaces/user.interface";
 
 @Injectable()
 export class TokenService {
@@ -13,7 +13,7 @@ export class TokenService {
     private redisService: RedisService,
   ) {}
 
-  async generateToken(payload: Partial<IUser>): Promise<IAuthTokens> {
+  async generateToken(payload: Partial<User>): Promise<IAuthTokens> {
     const accessToken = await this.jwtService.signAsync(
       {
         id: payload.id,
@@ -40,13 +40,13 @@ export class TokenService {
   async verifyAccessToken(accessToken: string) {
     return (await this.jwtService.verifyAsync(accessToken, {
       secret: process.env.JWT_ACCESS_TOKEN_SECRET,
-    })) as IUser;
+    })) as User;
   }
 
   async verifyRefreshToken(refreshToken: string) {
     return (await this.jwtService.verifyAsync(refreshToken, {
       secret: process.env.JWT_REFRESH_TOKEN_SECRET,
-    })) as IUser;
+    })) as User;
   }
 
   async isBlacklisted(token: string) {
