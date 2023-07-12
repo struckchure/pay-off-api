@@ -1,21 +1,32 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { HttpService } from "@nestjs/axios";
+import { Injectable, NotImplementedException } from "@nestjs/common";
+import { firstValueFrom } from "rxjs";
 
 import { BiometricsDAO } from "@/modules/biometrics/dao/biometrics.dao";
 import {
-  IBiometricsCreate,
-  IBiometricsUpdate,
+  BiometricType,
+  BiometricsCreateArgs,
+  BiometricsUpdateArgs,
+  BiometricsVerify,
 } from "@/modules/biometrics/interfaces/biometrics.interface";
+import { BIOMETRICS_VERIFICATION_API_URL } from "@/shared/constants/env-vars";
 import { MediaService } from "@/shared/media/media.service";
+
+interface BiometricsVerificationResponse {
+  matchScore: number;
+}
 
 @Injectable()
 export class BiometricsService {
   constructor(
-    private biometricsDAO: BiometricsDAO,
     private mediaService: MediaService,
+    private httpsService: HttpService,
+
+    private biometricsDAO: BiometricsDAO,
   ) {}
 
   async biometricsCreate(
-    biometricsCreateArgs: Omit<IBiometricsCreate, "biometricUrl"> & {
+    biometricsCreateArgs: Omit<BiometricsCreateArgs, "biometricUrl"> & {
       image: Express.Multer.File;
     },
   ) {
@@ -33,7 +44,7 @@ export class BiometricsService {
 
   async biometricsUpdate(
     biometricId: string,
-    biometricsUpdateArgs: Omit<IBiometricsUpdate, "biometricUrl"> & {
+    biometricsUpdateArgs: Omit<BiometricsUpdateArgs, "biometricUrl"> & {
       image: Express.Multer.File;
     },
   ) {
@@ -50,5 +61,38 @@ export class BiometricsService {
 
   async biometricsDelete(biometricId: string) {
     await this.biometricsDAO.biometricsDelete({ id: biometricId });
+  }
+
+  async biometricsVerify(biometricsVerifyArgs: BiometricsVerify) {
+    switch (biometricsVerifyArgs.biometricType) {
+      case BiometricType.FINGERPRINT:
+        const payload = new FormData();
+        payload.append(
+          "target",
+          new Blob([biometricsVerifyArgs.target.buffer]),
+          biometricsVerifyArgs.target.originalname,
+        );
+        payload.append(
+          "sample",
+          new Blob([biometricsVerifyArgs.sample.buffer]),
+          biometricsVerifyArgs.sample.originalname,
+        );
+
+        const biometricsVerificationResponse =
+          this.httpsService.post<BiometricsVerificationResponse>(
+            `${BIOMETRICS_VERIFICATION_API_URL}/fingerprint/`,
+            payload,
+          );
+        const result = await firstValueFrom(biometricsVerificationResponse);
+        const {
+          data: { matchScore },
+        } = result;
+
+        if (matchScore >= 75) return { status: true, matchRate: matchScore };
+
+        return { status: false, matchRate: matchScore };
+      default:
+        throw new NotImplementedException();
+    }
   }
 }

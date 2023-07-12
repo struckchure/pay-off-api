@@ -10,20 +10,23 @@ import {
   Post,
   Req,
   UploadedFile,
-  UseGuards,
+  UploadedFiles,
   UseInterceptors,
 } from "@nestjs/common";
-import { FileInterceptor } from "@nestjs/platform-express";
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+} from "@nestjs/platform-express";
 
-import { AuthGuard } from "@/modules/auth/guards/auth.guard";
 import {
   BiometricsCreateDTO,
   BiometricsUpdateDTO,
 } from "@/modules/biometrics/dto/biometrics.dto";
 import { BiometricsService } from "@/modules/biometrics/services/biometrics.service";
+import { BiometricType } from "../interfaces/biometrics.interface";
 
 @Controller("biometrics")
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 export class BiometricsController {
   constructor(private biometricsService: BiometricsService) {}
 
@@ -66,5 +69,28 @@ export class BiometricsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async biometricsDelete(@Param("biometricId") biometricId: string) {
     await this.biometricsService.biometricsDelete(biometricId);
+  }
+
+  @Post("verify")
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: "target", maxCount: 1 },
+      { name: "sample", maxCount: 1 },
+    ]),
+  )
+  async biometricsVerification(
+    @UploadedFiles()
+    files: {
+      target: Express.Multer.File[];
+      sample: Express.Multer.File[];
+    },
+  ) {
+    const { target, sample } = files;
+
+    return this.biometricsService.biometricsVerify({
+      biometricType: BiometricType.FINGERPRINT,
+      target: target[0],
+      sample: sample[0],
+    });
   }
 }
