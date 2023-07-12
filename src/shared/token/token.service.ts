@@ -1,10 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 
-import { BLACKLISTED_TOKENS } from "@/shared/constants";
-import { RedisService } from "@/shared/redis/redis.service";
 import { IAuthTokens } from "@/modules/auth/interfaces/auth.interface";
 import { User } from "@/modules/user/interfaces/user.interface";
+import { BLACKLISTED_TOKENS } from "@/shared/constants";
+import {
+  JWT_ACCESS_TOKEN_EXPIRY,
+  JWT_ACCESS_TOKEN_SECRET,
+  JWT_REFRESH_TOKEN_EXPIRY,
+  JWT_REFRESH_TOKEN_SECRET,
+} from "@/shared/constants/env-vars";
+import { RedisService } from "@/shared/redis/redis.service";
 
 @Injectable()
 export class TokenService {
@@ -22,15 +28,15 @@ export class TokenService {
         email: payload.email,
       },
       {
-        secret: process.env.JWT_ACCESS_TOKEN_SECRET,
-        expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRY,
+        secret: JWT_ACCESS_TOKEN_SECRET,
+        expiresIn: JWT_ACCESS_TOKEN_EXPIRY,
       },
     );
     const refreshToken = await this.jwtService.signAsync(
       { id: payload.id },
       {
-        secret: process.env.JWT_REFRESH_TOKEN_SECRET,
-        expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRY,
+        secret: JWT_REFRESH_TOKEN_SECRET,
+        expiresIn: JWT_REFRESH_TOKEN_EXPIRY,
       },
     );
 
@@ -39,13 +45,13 @@ export class TokenService {
 
   async verifyAccessToken(accessToken: string) {
     return (await this.jwtService.verifyAsync(accessToken, {
-      secret: process.env.JWT_ACCESS_TOKEN_SECRET,
+      secret: JWT_ACCESS_TOKEN_SECRET,
     })) as User;
   }
 
   async verifyRefreshToken(refreshToken: string) {
     return (await this.jwtService.verifyAsync(refreshToken, {
-      secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+      secret: JWT_REFRESH_TOKEN_SECRET,
     })) as User;
   }
 
