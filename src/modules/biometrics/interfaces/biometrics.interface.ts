@@ -37,7 +37,7 @@ export type BiometricsUpdateArgs = Partial<
 
 export type BiometricsDeleteArgs = BiometricsGetArgs;
 
-export interface IBiometricsVerify {
+export interface BiometricsVerify {
   biometricType: BiometricType;
   target: Express.Multer.File;
   sample: Express.Multer.File;
