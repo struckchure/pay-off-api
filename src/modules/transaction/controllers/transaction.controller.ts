@@ -43,17 +43,27 @@ export class TransactionController {
   @Get(":transactionId")
   @AllowedUserTypes(UserType.ADMIN, UserType.CUSTOMER, UserType.MERCHANT)
   async transactionGet(
-    @Param(ParseUUIDPipe) transactionId: string,
+    @Param("transactionId", ParseUUIDPipe) transactionId: string,
     @Req() request: Request,
   ) {
     // TODO: refactor object owner permission here
     const transaction = await this.transactionService.transactionGet({
       id: transactionId,
     });
-    if (
-      request.user.userType === UserType.ADMIN ||
-      transaction.userId !== request.user.id
-    ) {
+
+    let canViewObject = false;
+    switch (request.user.userType) {
+      case UserType.CUSTOMER:
+        if (transaction.userId === request.user.id) {
+          canViewObject = true;
+          break;
+        }
+      case UserType.ADMIN:
+        canViewObject = true;
+        break;
+    }
+
+    if (!canViewObject) {
       throw new ForbiddenException(
         "you are not authorized to access this resource",
       );
