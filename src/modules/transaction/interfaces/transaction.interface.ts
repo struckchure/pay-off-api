@@ -6,6 +6,7 @@ export interface TransactionListArgs {
 
   userId?: string;
   transactionType?: TransactionType;
+  transactionStatus?: TransactionStatus;
 }
 
 export interface TransactionCreateArgs<T = string> {
@@ -19,7 +20,8 @@ export interface TransactionCreateArgs<T = string> {
 }
 
 export interface TransactionGetArgs {
-  id: string;
+  id?: string;
+  reference?: string;
 }
 
 export type TransactionUpdateArgs = Partial<TransactionCreateArgs>;
