@@ -1,3 +1,4 @@
+import { UserType } from "@prisma/client";
 import { Request as ExpressRequest } from "express";
 
 declare global {
@@ -5,6 +6,7 @@ declare global {
     user?: {
       id: string;
       email: string;
+      userType: UserType;
     };
   }
 
