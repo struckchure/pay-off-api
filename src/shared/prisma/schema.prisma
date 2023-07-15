@@ -56,6 +56,12 @@ enum TransactionType {
   DEBIT  @map("DEBIT")
 }
 
+enum TransactionStatus {
+  PENDING     @map("PENDING")
+  FAILED      @map("FAILED")
+  SUCCESSFULL @map("SUCCESSFULL")
+}
+
 model Transaction {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
@@ -64,10 +70,12 @@ model Transaction {
   userId String?
   user   User?   @relation(fields: [userId], references: [id], onDelete: NoAction)
 
-  amount          Decimal
-  transactionType TransactionType
-  description     String?
-  meta            Json?
+  amount            Decimal
+  transactionType   TransactionType
+  transactionStatus TransactionStatus?
+  reference         String
+  description       String?
+  meta              Json?
 
   @@map("transactions")
 }
