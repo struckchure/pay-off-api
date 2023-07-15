@@ -19,7 +19,6 @@ import {
   FLUTTERWAVE_API_URL,
   FLUTTERWAVE_SK,
 } from "@/shared/constants/env-vars";
-import { removeNullOrEmptyValues } from "@/shared/utils";
 
 @Injectable()
 export class FlutterwaveClient {
