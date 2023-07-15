@@ -54,10 +54,7 @@ export class TransactionDAO {
 
   async transactionGet(transactionGetArgs: TransactionGetArgs) {
     return await this.prismaService.transaction.findFirst({
-      where:
-        removeNullOrEmptyValues<Prisma.TransactionWhereInput>(
-          transactionGetArgs,
-        ),
+      where: transactionGetArgs,
     });
   }
 
