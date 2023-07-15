@@ -40,6 +40,18 @@ export class TransactionDAO {
     });
   }
 
+  transactionCreateNoAsync(transactionCreateArgs: TransactionCreateArgs) {
+    return this.prismaService.transaction.create({
+      data: {
+        ...removeObjectValueByKey<Omit<TransactionCreateArgs, "userId">>(
+          transactionCreateArgs,
+          "userId",
+        ),
+        user: { connect: { id: transactionCreateArgs.userId } },
+      },
+    });
+  }
+
   async transactionGet(transactionGetArgs: TransactionGetArgs) {
     return await this.prismaService.transaction.findFirst({
       where:
