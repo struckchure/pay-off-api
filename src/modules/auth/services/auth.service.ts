@@ -11,9 +11,9 @@ import { TokenService } from "@/shared/token/token.service";
 import { removeObjectValueByKey } from "@/shared/utils";
 import { UserDAO } from "@/modules/user/dao/user.dao";
 import {
-  IAuthLogin,
-  IAuthRegister,
-  IAuthTokens,
+  AuthLoginArgs,
+  AuthRegisterArgs,
+  AuthTokensArgs,
 } from "@/modules/auth/interfaces/auth.interface";
 import { User } from "@/modules/user/interfaces/user.interface";
 
@@ -27,8 +27,8 @@ export class AuthService {
   ) {}
 
   async authRegister(
-    authRegisterArgs: IAuthRegister,
-  ): Promise<Omit<User, "password"> & { tokens: IAuthTokens }> {
+    authRegisterArgs: AuthRegisterArgs,
+  ): Promise<Omit<User, "password"> & { tokens: AuthTokensArgs }> {
     const userExists = !!(await this.userDAO.userGet({
       email: authRegisterArgs.email,
     }));
@@ -51,8 +51,8 @@ export class AuthService {
   }
 
   async authLogin(
-    authLoginArgs: IAuthLogin,
-  ): Promise<Omit<User, "password"> & { tokens: IAuthTokens }> {
+    authLoginArgs: AuthLoginArgs,
+  ): Promise<Omit<User, "password"> & { tokens: AuthTokensArgs }> {
     const user = await this.userDAO.userGet({
       email: authLoginArgs.email,
     });
@@ -75,7 +75,7 @@ export class AuthService {
     await this.redisService.push(BLACKLISTED_TOKENS, refreshToken);
   }
 
-  async authObtainTokens(refreshToken: string): Promise<IAuthTokens> {
+  async authObtainTokens(refreshToken: string): Promise<AuthTokensArgs> {
     if (await this.tokenService.isBlacklisted(refreshToken)) {
       throw new UnauthorizedException("Refresh token is not valid");
     }

@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 
 import {
-  IAuthGetProfile,
-  IAuthUpdateProfile,
+  AuthGetProfileArgs,
+  AuthUpdateProfileArgs,
 } from "@/modules/auth/interfaces/auth.interface";
 import { UserDAO } from "@/modules/user/dao/user.dao";
 import { User } from "@/modules/user/interfaces/user.interface";
@@ -12,7 +12,7 @@ import { removeObjectValueByKey } from "@/shared/utils";
 export class UserService {
   constructor(private userDAO: UserDAO) {}
 
-  async userGetProfile(userGetProfileArgs: IAuthGetProfile): Promise<User> {
+  async userGetProfile(userGetProfileArgs: AuthGetProfileArgs): Promise<User> {
     const user = await this.userDAO.userGet({ id: userGetProfileArgs.id });
     if (!user) throw new NotFoundException("user does not exist");
 
@@ -20,8 +20,8 @@ export class UserService {
   }
 
   async userUpdateProfile(
-    userGetProfileArgs: IAuthGetProfile,
-    userUpdateProfileArgs: IAuthUpdateProfile,
+    userGetProfileArgs: AuthGetProfileArgs,
+    userUpdateProfileArgs: AuthUpdateProfileArgs,
   ): Promise<User> {
     return removeObjectValueByKey(
       await this.userDAO.userUpdate(

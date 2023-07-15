@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 
-import { IAuthTokens } from "@/modules/auth/interfaces/auth.interface";
+import { AuthTokensArgs } from "@/modules/auth/interfaces/auth.interface";
 import { User } from "@/modules/user/interfaces/user.interface";
 import { BLACKLISTED_TOKENS } from "@/shared/constants";
 import {
@@ -19,7 +19,7 @@ export class TokenService {
     private redisService: RedisService,
   ) {}
 
-  async generateToken(payload: Partial<User>): Promise<IAuthTokens> {
+  async generateToken(payload: Partial<User>): Promise<AuthTokensArgs> {
     const accessToken = await this.jwtService.signAsync(
       {
         id: payload.id,

@@ -4,18 +4,18 @@ import {
   UserUpdateArgs,
 } from "@/modules/user/interfaces/user.interface";
 
-export type IAuthRegister = UserCreateArgs;
+export type AuthRegisterArgs = UserCreateArgs;
 
-export interface IAuthLogin {
+export interface AuthLoginArgs {
   email: string;
   password: string;
 }
 
-export type IAuthGetProfile = Pick<UserGetArgs, "id">;
+export type AuthGetProfileArgs = Pick<UserGetArgs, "id">;
 
-export type IAuthUpdateProfile = UserUpdateArgs;
+export type AuthUpdateProfileArgs = UserUpdateArgs;
 
-export interface IAuthTokens {
+export interface AuthTokensArgs {
   accessToken: string;
   refreshToken: string;
 }
