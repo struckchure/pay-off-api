@@ -78,7 +78,7 @@ export class WalletService {
       userId: senderWallet.userId,
       amount: walletTransferArgs.amount,
       transactionType: TransactionType.DEBIT,
-      transactionStatus: TransactionStatus.SUCCESSFULL,
+      transactionStatus: TransactionStatus.SUCCESSFUL,
       reference: crypto.randomBytes(4).toString("hex"),
     });
     const debit = this.walletDAO.walletUpdateNoAsync(
@@ -89,7 +89,7 @@ export class WalletService {
       userId: recieverWallet.userId,
       amount: walletTransferArgs.amount,
       transactionType: TransactionType.CREDIT,
-      transactionStatus: TransactionStatus.SUCCESSFULL,
+      transactionStatus: TransactionStatus.SUCCESSFUL,
       reference: crypto.randomBytes(4).toString("hex"),
     });
     const credit = this.walletDAO.walletUpdateNoAsync(
