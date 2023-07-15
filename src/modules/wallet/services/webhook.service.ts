@@ -22,54 +22,48 @@ export class WebhookService {
   ) {}
 
   async webhookFlutterwave(webhookFlutterwaveArgs: FlutterwaveWebhookResponse) {
-    if (webhookFlutterwaveArgs.event === "charge.completed") {
-      const transaction = await this.transactionDAO.transactionGet({
-        reference: webhookFlutterwaveArgs.data.tx_ref,
+    const transaction = await this.transactionDAO.transactionGet({
+      reference: webhookFlutterwaveArgs.data.tx_ref,
+    });
+    if (!transaction) throw new NotFoundException("transaction not found");
+
+    if (transaction.transactionStatus !== TransactionStatus.PENDING) {
+      throw new BadRequestException("transaction already verified");
+    }
+
+    if (webhookFlutterwaveArgs?.data?.status === "successful") {
+      const { status } = await this.paymentClient.verifyPayment({
+        paymentGateway: PaymentGateway.FLUTTERWAVE,
+        payload: { paymentId: webhookFlutterwaveArgs.data.id },
       });
-      if (!transaction) throw new NotFoundException("transaction not found");
 
-      if (transaction.transactionStatus !== TransactionStatus.PENDING) {
-        throw new BadRequestException("transaction already verified");
-      }
+      if (status !== "successful") throw new BadRequestException(status);
 
-      if (webhookFlutterwaveArgs?.data?.status === "successful") {
-        const { status } = await this.paymentClient.verifyPayment({
-          paymentGateway: PaymentGateway.FLUTTERWAVE,
-          payload: { paymentId: webhookFlutterwaveArgs.data.id },
-        });
+      await this.transactionDAO.transactionUpdate(
+        { id: transaction.id },
+        { transactionStatus: TransactionStatus.SUCCESSFUL },
+      );
 
-        if (status !== "successful") throw new BadRequestException(status);
+      const wallet = await this.walletService.walletGet({
+        userId: transaction.userId,
+      });
+      const newWalletBalance = +transaction.amount + +wallet.balance;
 
-        await this.transactionDAO.transactionUpdate(
-          { id: transaction.id },
-          { transactionStatus: TransactionStatus.SUCCESSFUL },
-        );
+      await this.walletDAO.walletUpdate(
+        { userId: transaction.userId },
+        { balance: newWalletBalance },
+      );
 
-        const wallet = await this.walletService.walletGet({
-          userId: transaction.userId,
-        });
-        const newWalletBalance = +transaction.amount + +wallet.balance;
-
-        await this.walletDAO.walletUpdate(
-          { userId: transaction.userId },
-          { balance: newWalletBalance },
-        );
-
-        return {
-          message: "flutterwave wehbook verification successful",
-        };
-      } else {
-        await this.transactionDAO.transactionUpdate(
-          { id: transaction.id },
-          { transactionStatus: TransactionStatus.FAILED },
-        );
-
-        throw new BadRequestException(
-          "flutterwave webhook verification failed",
-        );
-      }
+      return {
+        message: "flutterwave wehbook verification successful",
+      };
     } else {
-      throw new BadRequestException("flutterwave webhook event not supported");
+      await this.transactionDAO.transactionUpdate(
+        { id: transaction.id },
+        { transactionStatus: TransactionStatus.FAILED },
+      );
+
+      throw new BadRequestException("flutterwave webhook verification failed");
     }
   }
 }
