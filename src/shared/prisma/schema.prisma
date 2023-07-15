@@ -57,9 +57,9 @@ enum TransactionType {
 }
 
 enum TransactionStatus {
-  PENDING     @map("PENDING")
-  FAILED      @map("FAILED")
-  SUCCESSFULL @map("SUCCESSFULL")
+  PENDING    @map("PENDING")
+  FAILED     @map("FAILED")
+  SUCCESSFUL @map("SUCCESSFUL")
 }
 
 model Transaction {
@@ -73,7 +73,7 @@ model Transaction {
   amount            Decimal
   transactionType   TransactionType
   transactionStatus TransactionStatus?
-  reference         String
+  reference         String             @unique
   description       String?
   meta              Json?
 
