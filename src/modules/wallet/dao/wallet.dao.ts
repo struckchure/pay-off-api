@@ -57,6 +57,7 @@ export class WalletDAO {
     walletGetArgs: WalletGetArgs,
     walletUpdateArgs: WalletUpdateArgs,
   ) {
+    // TODO: raise error if wallet does not exist
     return this.prismaService.wallet.update({
       where: removeNullOrEmptyValues(walletGetArgs),
       data: walletUpdateArgs,

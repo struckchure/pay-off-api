@@ -11,6 +11,7 @@ import { BiometricsClient } from "@/shared/clients/biometrics";
 import { MediaService } from "@/shared/media/media.service";
 import { RedisService } from "@/shared/redis/redis.service";
 import { TokenService } from "@/shared/token/token.service";
+import { TransactionDAO } from "../transaction/dao/transaction.dao";
 
 @Module({
   controllers: [WalletController],
@@ -21,6 +22,7 @@ import { TokenService } from "@/shared/token/token.service";
     MediaService,
     RedisService,
     TokenService,
+    TransactionDAO,
     UserDAO,
     WalletDAO,
     WalletService,

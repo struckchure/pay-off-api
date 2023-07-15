@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 
+import { TransactionDAO } from "@/modules/transaction/dao/transaction.dao";
 import { UserDAO } from "@/modules/user/dao/user.dao";
 import { WalletDAO } from "@/modules/wallet/dao/wallet.dao";
 import {
@@ -12,11 +13,13 @@ import {
   WalletTransferArgs,
 } from "@/modules/wallet/interfaces/wallet.interface";
 import { AtomicHelper } from "@/shared/prisma/prisma.utils";
+import { TransactionType } from "@prisma/client";
 
 @Injectable()
 export class WalletService {
   constructor(
     private atomicHelper: AtomicHelper,
+    private transactionDAO: TransactionDAO,
     private userDAO: UserDAO,
     private walletDAO: WalletDAO,
   ) {}
@@ -62,20 +65,35 @@ export class WalletService {
       throw new BadRequestException("insufficient funds");
     }
 
-    const newSenderBalance = +senderWallet.balance - walletTransferArgs.amount;
+    const newSenderBalance = +senderWallet.balance - +walletTransferArgs.amount;
     const newRecieverBalance =
-      +recieverWallet.balance + walletTransferArgs.amount;
+      +recieverWallet.balance + +walletTransferArgs.amount;
 
+    const debitTransaction = this.transactionDAO.transactionCreateNoAsync({
+      userId: senderWallet.userId,
+      amount: walletTransferArgs.amount,
+      transactionType: TransactionType.DEBIT,
+    });
     const debit = this.walletDAO.walletUpdateNoAsync(
       { userId: senderWallet.userId },
       { balance: newSenderBalance },
     );
+    const creditTransaction = this.transactionDAO.transactionCreateNoAsync({
+      userId: recieverWallet.userId,
+      amount: walletTransferArgs.amount,
+      transactionType: TransactionType.CREDIT,
+    });
     const credit = this.walletDAO.walletUpdateNoAsync(
       { userId: recieverWallet.userId },
       { balance: newRecieverBalance },
     );
 
-    await this.atomicHelper.atomic([debit, credit]);
+    await this.atomicHelper.atomic([
+      debitTransaction,
+      debit,
+      creditTransaction,
+      credit,
+    ]);
 
     return {
       message: `you just sent NGN ${walletTransferArgs.amount} to ${walletTransferArgs.to}`,
