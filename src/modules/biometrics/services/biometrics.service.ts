@@ -24,6 +24,7 @@ export class BiometricsService {
       image: Express.Multer.File;
     },
   ) {
+    // TODO: check if biometrics exists
     return this.biometricsDAO.biometricsCreate({
       userId: biometricsCreateArgs.userId,
       biometricType: biometricsCreateArgs.biometricType,
@@ -42,6 +43,7 @@ export class BiometricsService {
       image: Express.Multer.File;
     },
   ) {
+    // TODO: raise error if biometrics does not exist
     return await this.biometricsDAO.biometricsUpdate(
       { id: biometricId },
       {
