@@ -1,5 +1,12 @@
 import { Type } from "class-transformer";
-import { IsEmail, IsNumber, IsOptional, Min, MinLength } from "class-validator";
+import {
+  IsEmail,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+  MinLength,
+} from "class-validator";
 
 export class WalletTransferDTO {
   @IsEmail()
@@ -13,4 +20,13 @@ export class WalletTransferDTO {
   @IsOptional()
   @MinLength(10)
   description: string;
+}
+
+export class WalletFundDTO {
+  @IsNumber()
+  amount: number;
+
+  @IsString()
+  @IsOptional()
+  redirectUrl: string;
 }

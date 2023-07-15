@@ -11,7 +11,10 @@ import { FileInterceptor } from "@nestjs/platform-express";
 
 import { AuthGuard } from "@/modules/auth/guards/auth.guard";
 import { BiometricsInterceptor } from "@/modules/biometrics/interceptors/biometrics.interceptor";
-import { WalletTransferDTO } from "@/modules/wallet/dto/wallet.dto";
+import {
+  WalletFundDTO,
+  WalletTransferDTO,
+} from "@/modules/wallet/dto/wallet.dto";
 import { WalletService } from "@/modules/wallet/services/wallet.service";
 
 @Controller("wallet")
@@ -33,6 +36,18 @@ export class WalletController {
     return await this.walletService.walletTransfer({
       ...walletTransferDTO,
       from: request.user.email,
+    });
+  }
+
+  @Post("fund")
+  async walletFund(
+    @Body() walletFundDTO: WalletFundDTO,
+    @Req() request: Request,
+  ) {
+    return await this.walletService.walletFund({
+      ...walletFundDTO,
+      email: request.user.email,
+      redirectUrl: `${request.protocol}://${request.get("Host")}/callback`,
     });
   }
 }

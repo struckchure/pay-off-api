@@ -27,3 +27,9 @@ export interface WalletTransferArgs {
   amount: number;
   description?: string;
 }
+
+export interface WalletFundArgs {
+  amount: number;
+  email: string;
+  redirectUrl: string;
+}

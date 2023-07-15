@@ -12,6 +12,8 @@ import { MediaService } from "@/shared/media/media.service";
 import { RedisService } from "@/shared/redis/redis.service";
 import { TokenService } from "@/shared/token/token.service";
 import { TransactionDAO } from "../transaction/dao/transaction.dao";
+import { PaymentClient } from "@/shared/clients/payments";
+import { FlutterwaveClient } from "@/shared/clients/payments/flutterwave";
 
 @Module({
   controllers: [WalletController],
@@ -19,7 +21,9 @@ import { TransactionDAO } from "../transaction/dao/transaction.dao";
     BiometricsClient,
     BiometricsDAO,
     BiometricsService,
+    FlutterwaveClient,
     MediaService,
+    PaymentClient,
     RedisService,
     TokenService,
     TransactionDAO,
