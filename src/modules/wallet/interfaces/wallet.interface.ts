@@ -33,3 +33,10 @@ export interface WalletFundArgs {
   email: string;
   redirectUrl: string;
 }
+
+export interface WalletWithdrawalArgs {
+  userId: string;
+  accountBank: string;
+  accountNumber: string;
+  amount: number;
+}
