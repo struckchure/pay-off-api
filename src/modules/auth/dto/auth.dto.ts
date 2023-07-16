@@ -1,4 +1,12 @@
-import { IsEmail, IsJWT, IsNotEmpty, MinLength } from "class-validator";
+import {
+  IsEmail,
+  IsJWT,
+  IsNotEmpty,
+  IsNumberString,
+  IsOptional,
+  Length,
+  MinLength,
+} from "class-validator";
 
 export class AuthRegisterDTO {
   @IsNotEmpty()
@@ -13,6 +21,15 @@ export class AuthRegisterDTO {
 
   @MinLength(8)
   password: string;
+
+  @IsOptional()
+  @MinLength(6)
+  username: string;
+
+  @IsOptional()
+  @Length(11)
+  @IsNumberString()
+  bvn: string;
 }
 
 export class AuthLoginDTO {
