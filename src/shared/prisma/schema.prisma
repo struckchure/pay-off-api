@@ -25,16 +25,18 @@ model User {
 
   firstName String   @db.VarChar(100)
   lastName  String   @db.VarChar(100)
-  email     String   @db.VarChar(100)
+  email     String   @unique @db.VarChar(100)
   password  String
   userType  UserType @default(CUSTOMER)
   isActive  Boolean  @default(true)
   username  String   @unique
+  bvn       String?  @db.VarChar(11)
 
   Wallet      Wallet[]
   Biometric   Biometric?
   Transaction Transaction[]
 
+  @@unique([email, bvn])
   @@map("users")
 }
 
