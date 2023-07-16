@@ -3,6 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common";
+import * as crypto from "crypto";
 
 import { BLACKLISTED_TOKENS } from "@/shared/constants";
 import { CryptoService } from "@/shared/crypto/crypto.service";
@@ -27,7 +28,7 @@ export class AuthService {
   ) {}
 
   async authRegister(
-    authRegisterArgs: AuthRegisterArgs,
+    authRegisterArgs: Omit<AuthRegisterArgs, "username">,
   ): Promise<Omit<User, "password"> & { tokens: AuthTokensArgs }> {
     const userExists = !!(await this.userDAO.userGet({
       email: authRegisterArgs.email,
@@ -40,7 +41,10 @@ export class AuthService {
     );
 
     const user = removeObjectValueByKey(
-      await this.userDAO.userCreate(authRegisterArgs),
+      await this.userDAO.userCreate({
+        ...authRegisterArgs,
+        username: crypto.randomBytes(4).toString("hex"),
+      }),
       "password",
     ) as unknown as User;
 
