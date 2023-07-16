@@ -13,6 +13,7 @@ import {
   WalletGetArgs,
   WalletListArgs,
   WalletTransferArgs,
+  WalletWithdrawalResolveAccountArgs,
   WalletWithdrawalArgs,
 } from "@/modules/wallet/interfaces/wallet.interface";
 import { PaymentClient } from "@/shared/clients/payments";
@@ -179,5 +180,14 @@ export class WalletService {
     } else {
       throw new BadRequestException("failed, could not initialize withdrawal");
     }
+  }
+
+  async walletWithdrawalResolveAccount(
+    walletWithdrawalResolveAccountArgs: WalletWithdrawalResolveAccountArgs,
+  ) {
+    return await this.paymentClient.resolveBankAccount({
+      paymentGateway: PaymentGateway.FLUTTERWAVE,
+      payload: walletWithdrawalResolveAccountArgs,
+    });
   }
 }
