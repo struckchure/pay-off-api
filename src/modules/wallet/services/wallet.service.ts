@@ -13,11 +13,13 @@ import {
   WalletGetArgs,
   WalletListArgs,
   WalletTransferArgs,
+  WalletWithdrawalArgs,
 } from "@/modules/wallet/interfaces/wallet.interface";
+import { PaymentClient } from "@/shared/clients/payments";
+import { FlutterwaveInitiateTransferArgs } from "@/shared/clients/payments/flutterwave/interface";
+import { PaymentGateway } from "@/shared/clients/payments/interface";
 import { AtomicHelper } from "@/shared/prisma/prisma.utils";
 import { TransactionStatus, TransactionType } from "@prisma/client";
-import { PaymentClient } from "@/shared/clients/payments";
-import { PaymentGateway } from "@/shared/clients/payments/interface";
 
 @Injectable()
 export class WalletService {
@@ -132,5 +134,50 @@ export class WalletService {
     });
 
     return { link };
+  }
+
+  async walletWithdrawal(walletWithdrawalArgs: WalletWithdrawalArgs) {
+    const wallet = await this.walletGet({
+      userId: walletWithdrawalArgs.userId,
+    });
+
+    const isBalanceSufficient = +wallet.balance >= +walletWithdrawalArgs.amount;
+    if (!isBalanceSufficient) {
+      throw new BadRequestException("insufficient funds");
+    }
+
+    const { status, reference } =
+      await this.paymentClient.transfer<FlutterwaveInitiateTransferArgs>({
+        paymentGateway: PaymentGateway.FLUTTERWAVE,
+        payload: {
+          accountBank: walletWithdrawalArgs.accountBank,
+          accountNumber: walletWithdrawalArgs.accountNumber,
+          amount: walletWithdrawalArgs.amount,
+          narration: `Withdrawal / ${walletWithdrawalArgs.accountNumber}, ${walletWithdrawalArgs.accountBank}`,
+          redirectUrl: "http://localhost:9000",
+          reference: crypto.randomBytes(4).toString("hex"),
+        },
+      });
+
+    if (status) {
+      const transaction = this.transactionDAO.transactionCreateNoAsync({
+        userId: walletWithdrawalArgs.userId,
+        amount: walletWithdrawalArgs.amount,
+        transactionType: TransactionType.DEBIT,
+        transactionStatus: TransactionStatus.PENDING,
+        reference,
+        description: `Wallet Withdrawal / NGN ${walletWithdrawalArgs.amount}`,
+        meta: {
+          accountNumber: walletWithdrawalArgs.accountNumber,
+          accountBank: walletWithdrawalArgs.accountBank,
+        },
+      });
+
+      await this.atomicHelper.atomic([transaction]);
+
+      return { message: "successful, transaction is being processed" };
+    } else {
+      throw new BadRequestException("failed, could not initialize withdrawal");
+    }
   }
 }
