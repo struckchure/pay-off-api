@@ -1,8 +1,11 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
+  ParseBoolPipe,
   Post,
+  Query,
   Req,
   UseGuards,
   UseInterceptors,
@@ -48,7 +51,9 @@ export class WalletController {
     return await this.walletService.walletFund({
       ...walletFundDTO,
       email: request.user.email,
-      redirectUrl: `${request.protocol}://${request.get("Host")}/callback`,
+      redirectUrl: `${request.protocol}://${request.get(
+        "Host",
+      )}/callback/flutterwave/`,
     });
   }
 
@@ -56,7 +61,16 @@ export class WalletController {
   async walletWithdrawal(
     @Body() walletWithdrawalDTO: WalletWithdrawalDTO,
     @Req() request: Request,
+    @Query("resolveAccount", new DefaultValuePipe(false), ParseBoolPipe)
+    resolveAccount: boolean,
   ) {
+    if (resolveAccount) {
+      return await this.walletService.walletWithdrawalResolveAccount({
+        accountNumber: walletWithdrawalDTO.accountNumber,
+        accountBank: walletWithdrawalDTO.accountBank,
+      });
+    }
+
     return await this.walletService.walletWithdrawal({
       ...walletWithdrawalDTO,
       userId: request.user.id,
