@@ -7,8 +7,9 @@ import {
 } from "@/shared/clients/payments/interface";
 import {
   FlutterwaveInitiateTransferArgs,
+  FlutterwaveResolveBankAccountArgs,
   FlutterwaveVerifyPaymentArgs,
-} from "./flutterwave/interface";
+} from "@/shared/clients/payments/flutterwave/interface";
 
 @Injectable()
 export class PaymentClient {
@@ -28,7 +29,7 @@ export class PaymentClient {
   async verifyPayment(verifyPaymentArgs: PaymentArgs) {
     switch (verifyPaymentArgs.paymentGateway) {
       case PaymentGateway.FLUTTERWAVE:
-        return this.flutterwaveClient.fluttewaverVerifyPayment(
+        return this.flutterwaveClient.flutterwaveVerifyPayment(
           verifyPaymentArgs.payload,
         );
       default:
@@ -39,7 +40,7 @@ export class PaymentClient {
   async transfer<T = any>(transferArgs: PaymentArgs<T>) {
     switch (transferArgs.paymentGateway) {
       case PaymentGateway.FLUTTERWAVE:
-        return await this.flutterwaveClient.fluttewaverInitiateTransfer(
+        return await this.flutterwaveClient.flutterwaveInitiateTransfer(
           transferArgs.payload as FlutterwaveInitiateTransferArgs,
         );
       default:
@@ -50,9 +51,31 @@ export class PaymentClient {
   async verifyTransfer<T = any>(verifyTransferArgs: PaymentArgs<T>) {
     switch (verifyTransferArgs.paymentGateway) {
       case PaymentGateway.FLUTTERWAVE:
-        return await this.flutterwaveClient.fluttewaverVerifyTransfer(
+        return await this.flutterwaveClient.flutterwaveVerifyTransfer(
           verifyTransferArgs.payload as FlutterwaveVerifyPaymentArgs,
         );
+      default:
+        throw new NotImplementedException();
+    }
+  }
+
+  async listBanks(listBanksArgs: Pick<PaymentArgs, "paymentGateway">) {
+    switch (listBanksArgs.paymentGateway) {
+      case PaymentGateway.FLUTTERWAVE:
+        return await this.flutterwaveClient.flutterwaveListBanks();
+      default:
+        throw new NotImplementedException();
+    }
+  }
+
+  async resolveBankAccount<T = any>(resolveBankAccountArgs: PaymentArgs<T>) {
+    switch (resolveBankAccountArgs.paymentGateway) {
+      case PaymentGateway.FLUTTERWAVE:
+        return await this.flutterwaveClient.flutterwaveResolveBankAccount(
+          resolveBankAccountArgs.payload as FlutterwaveResolveBankAccountArgs,
+        );
+      default:
+        throw new NotImplementedException();
     }
   }
 }

@@ -14,6 +14,9 @@ import {
   FlutterwaveInitializeResponse,
   FlutterwaveInitiateTransferArgs,
   FlutterwaveInitiateTransferResponse,
+  FlutterwaveListBanksResponse,
+  FlutterwaveResolveBankAccountArgs,
+  FlutterwaveResolveBankAccountResponse,
   FlutterwaveVerifyPaymentArgs,
   FlutterwaveVerifyPaymentResponse,
   FlutterwaveVerifyTransferResponse,
@@ -22,6 +25,7 @@ import {
   FLUTTERWAVE_API_URL,
   FLUTTERWAVE_SK,
 } from "@/shared/constants/env-vars";
+import { sortByKey } from "@/shared/utils";
 
 @Injectable()
 export class FlutterwaveClient {
@@ -78,7 +82,7 @@ export class FlutterwaveClient {
     }
   }
 
-  async fluttewaverVerifyPayment(
+  async flutterwaveVerifyPayment(
     flutterwaveVerifyPaymentArgs: FlutterwaveVerifyPaymentArgs,
   ) {
     try {
@@ -111,7 +115,7 @@ export class FlutterwaveClient {
     }
   }
 
-  async fluttewaverInitiateTransfer(
+  async flutterwaveInitiateTransfer(
     flutterwaveInitiateTransferArgs: FlutterwaveInitiateTransferArgs,
   ) {
     try {
@@ -155,7 +159,7 @@ export class FlutterwaveClient {
     }
   }
 
-  async fluttewaverVerifyTransfer(
+  async flutterwaveVerifyTransfer(
     flutterwaveVerifyPaymentArgs: FlutterwaveVerifyPaymentArgs,
   ) {
     try {
@@ -176,6 +180,76 @@ export class FlutterwaveClient {
         status: responseData.data.status.toLowerCase() === "successful",
         reference: responseData.data.reference,
       };
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        throw new HttpException(
+          error.response.data.message || "An error occurred",
+          error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      } else {
+        throw new InternalServerErrorException(error.message);
+      }
+    }
+  }
+
+  async flutterwaveResolveBankAccount(
+    flutterwaveResolveBankAccountArgs: FlutterwaveResolveBankAccountArgs,
+  ) {
+    try {
+      const headers = {
+        Authorization: `Bearer ${FLUTTERWAVE_SK}`,
+      };
+      const payload = {
+        account_number: flutterwaveResolveBankAccountArgs.accountNumber,
+        account_bank: flutterwaveResolveBankAccountArgs.accountBank,
+      };
+
+      const flutterwaveResolveBankAccountRequest =
+        this.httpService.post<FlutterwaveResolveBankAccountResponse>(
+          `${FLUTTERWAVE_API_URL}/accounts/resolve/`,
+          payload,
+          {
+            headers,
+          },
+        );
+      const { data: responseData } = await firstValueFrom(
+        flutterwaveResolveBankAccountRequest,
+      );
+
+      return {
+        accountNumber: responseData.data.account_number,
+        accountName: responseData.data.account_name,
+      };
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        throw new HttpException(
+          error.response.data.message || "An error occurred",
+          error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      } else {
+        throw new InternalServerErrorException(error.message);
+      }
+    }
+  }
+
+  async flutterwaveListBanks() {
+    try {
+      const headers = {
+        Authorization: `Bearer ${FLUTTERWAVE_SK}`,
+      };
+
+      const flutterwaveListBanksRequest =
+        this.httpService.get<FlutterwaveListBanksResponse>(
+          `${FLUTTERWAVE_API_URL}/banks/NG/`,
+          {
+            headers,
+          },
+        );
+      const { data: responseData } = await firstValueFrom(
+        flutterwaveListBanksRequest,
+      );
+
+      return sortByKey(responseData.data, "name");
     } catch (error) {
       if (error instanceof AxiosError) {
         throw new HttpException(

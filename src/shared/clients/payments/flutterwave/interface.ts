@@ -116,3 +116,31 @@ export interface FlutterwaveVerifyTransferResponseData {
   is_approved: number;
   bank_name: string;
 }
+
+export interface FlutterwaveResolveBankAccountArgs {
+  accountNumber: string;
+  accountBank: string;
+}
+
+export interface FlutterwaveResolveBankAccountResponse {
+  status: string;
+  message: string;
+  data: FlutterwaveResolveBankAccountResponseData;
+}
+
+export interface FlutterwaveResolveBankAccountResponseData {
+  account_number: string;
+  account_name: string;
+}
+
+export interface FlutterwaveListBanksResponse {
+  status: string;
+  message: string;
+  data: FlutterwaveListBanksResponseData[];
+}
+
+export interface FlutterwaveListBanksResponseData {
+  id: number;
+  code: string;
+  name: string;
+}
