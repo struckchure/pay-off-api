@@ -12,8 +12,11 @@ import { firstValueFrom } from "rxjs";
 import {
   FlutterwaveInitializeArgs,
   FlutterwaveInitializeResponse,
+  FlutterwaveInitiateTransferArgs,
+  FlutterwaveInitiateTransferResponse,
   FlutterwaveVerifyPaymentArgs,
   FlutterwaveVerifyPaymentResponse,
+  FlutterwaveVerifyTransferResponse,
 } from "@/shared/clients/payments/flutterwave/interface";
 import {
   FLUTTERWAVE_API_URL,
@@ -93,8 +96,85 @@ export class FlutterwaveClient {
       );
 
       return {
-        status: responseData.data.status,
+        status: responseData.data.status.toLowerCase() === "successful",
         reference: responseData.data.tx_ref,
+      };
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        throw new HttpException(
+          error.response.data.message || "An error occurred",
+          error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      } else {
+        throw new InternalServerErrorException(error.message);
+      }
+    }
+  }
+
+  async fluttewaverInitiateTransfer(
+    flutterwaveInitiateTransferArgs: FlutterwaveInitiateTransferArgs,
+  ) {
+    try {
+      const headers = {
+        Authorization: `Bearer ${FLUTTERWAVE_SK}`,
+      };
+      const payload = {
+        account_bank: flutterwaveInitiateTransferArgs.accountBank,
+        account_number: flutterwaveInitiateTransferArgs.accountNumber,
+        amount: flutterwaveInitiateTransferArgs.amount,
+        narration: flutterwaveInitiateTransferArgs.narration,
+        currency: "NGN",
+        reference: flutterwaveInitiateTransferArgs.reference,
+        callback_url: flutterwaveInitiateTransferArgs.redirectUrl,
+      };
+
+      const flutterwaveInitiateTransferRequest =
+        this.httpService.post<FlutterwaveInitiateTransferResponse>(
+          `${FLUTTERWAVE_API_URL}/transfers/`,
+          payload,
+          { headers },
+        );
+      const { data: responseData } = await firstValueFrom(
+        flutterwaveInitiateTransferRequest,
+      );
+
+      return {
+        id: responseData.data.id,
+        reference: responseData.data.reference,
+        status: responseData.data.status === "NEW",
+      };
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        throw new HttpException(
+          error.response.data.message || "An error occurred",
+          error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      } else {
+        throw new InternalServerErrorException(error.message);
+      }
+    }
+  }
+
+  async fluttewaverVerifyTransfer(
+    flutterwaveVerifyPaymentArgs: FlutterwaveVerifyPaymentArgs,
+  ) {
+    try {
+      const headers = {
+        Authorization: `Bearer ${FLUTTERWAVE_SK}`,
+      };
+
+      const flutterwaveVerifyTransferRequest =
+        this.httpService.get<FlutterwaveVerifyTransferResponse>(
+          `${FLUTTERWAVE_API_URL}/transfers/${flutterwaveVerifyPaymentArgs.paymentId}/`,
+          { headers },
+        );
+      const { data: responseData } = await firstValueFrom(
+        flutterwaveVerifyTransferRequest,
+      );
+
+      return {
+        status: responseData.data.status.toLowerCase() === "successful",
+        reference: responseData.data.reference,
       };
     } catch (error) {
       if (error instanceof AxiosError) {
