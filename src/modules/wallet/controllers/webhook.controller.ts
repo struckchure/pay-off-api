@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
 
 import { WebhookService } from "@/modules/wallet/services/webhook.service";
-import { FlutterwaveWebhookResponse } from "@/shared/clients/payments/flutterwave/interface";
+import { FlutterwavePaymentWebhookResponse } from "@/shared/clients/payments/flutterwave/interface";
 
 @Controller("webhook")
 export class WebhookController {
@@ -10,7 +10,7 @@ export class WebhookController {
   @Post("flutterwave")
   @HttpCode(HttpStatus.OK)
   async wehbookFlutterwave(
-    @Body() wehbookFlutterwaveDTO: FlutterwaveWebhookResponse,
+    @Body() wehbookFlutterwaveDTO: FlutterwavePaymentWebhookResponse,
   ) {
     return await this.webhookService.webhookFlutterwave(wehbookFlutterwaveDTO);
   }
