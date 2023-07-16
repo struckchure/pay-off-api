@@ -40,3 +40,8 @@ export interface WalletWithdrawalArgs {
   accountNumber: string;
   amount: number;
 }
+
+export interface WalletWithdrawalResolveAccountArgs {
+  accountBank: string;
+  accountNumber: string;
+}
