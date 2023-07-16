@@ -26,6 +26,7 @@ export interface UserCreateArgs {
   email: string;
   password: string;
   userType?: UserType;
+  username: string;
 }
 
 export interface UserGetArgs {
