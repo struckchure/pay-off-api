@@ -27,6 +27,7 @@ export interface UserCreateArgs {
   password: string;
   userType?: UserType;
   username: string;
+  bvn?: string;
 }
 
 export interface UserGetArgs {
