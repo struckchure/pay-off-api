@@ -29,6 +29,7 @@ model User {
   password  String
   userType  UserType @default(CUSTOMER)
   isActive  Boolean  @default(true)
+  username  String   @unique
 
   Wallet      Wallet[]
   Biometric   Biometric?
