@@ -2,6 +2,7 @@ import { Type } from "class-transformer";
 import {
   IsEmail,
   IsNumber,
+  IsNumberString,
   IsOptional,
   IsString,
   Min,
@@ -29,4 +30,16 @@ export class WalletFundDTO {
   @IsString()
   @IsOptional()
   redirectUrl: string;
+}
+
+export class WalletWithdrawalDTO {
+  @IsNumber()
+  @Min(100)
+  amount: number;
+
+  @IsString()
+  accountBank: string;
+
+  @IsNumberString()
+  accountNumber: string;
 }
