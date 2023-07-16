@@ -14,6 +14,7 @@ import { BiometricsInterceptor } from "@/modules/biometrics/interceptors/biometr
 import {
   WalletFundDTO,
   WalletTransferDTO,
+  WalletWithdrawalDTO,
 } from "@/modules/wallet/dto/wallet.dto";
 import { WalletService } from "@/modules/wallet/services/wallet.service";
 
@@ -48,6 +49,17 @@ export class WalletController {
       ...walletFundDTO,
       email: request.user.email,
       redirectUrl: `${request.protocol}://${request.get("Host")}/callback`,
+    });
+  }
+
+  @Post("withdrawal")
+  async walletWithdrawal(
+    @Body() walletWithdrawalDTO: WalletWithdrawalDTO,
+    @Req() request: Request,
+  ) {
+    return await this.walletService.walletWithdrawal({
+      ...walletWithdrawalDTO,
+      userId: request.user.id,
     });
   }
 }
