@@ -40,3 +40,22 @@ export function removeObjectValueByKey<T = AnyObject>(obj: T, key: string): T {
 
   return result as T;
 }
+
+export function sortByKey<T>(array: T[], key: keyof T): T[] {
+  /**
+   * Author: ChatGPT
+   */
+
+  return array.sort((a, b) => {
+    const valueA = a[key];
+    const valueB = b[key];
+
+    if (valueA < valueB) {
+      return -1;
+    } else if (valueA > valueB) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+}
