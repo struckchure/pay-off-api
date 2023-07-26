@@ -10,6 +10,8 @@ import * as crypto from "crypto";
 import { firstValueFrom } from "rxjs";
 
 import {
+  FlutterwaveCreateVirtualAccountArgs,
+  FlutterwaveCreateVirtualAccountResponse,
   FlutterwaveInitializeArgs,
   FlutterwaveInitializeResponse,
   FlutterwaveInitiateTransferArgs,
@@ -250,6 +252,50 @@ export class FlutterwaveClient {
       );
 
       return sortByKey(responseData.data, "name");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        throw new HttpException(
+          error.response.data.message || "An error occurred",
+          error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      } else {
+        throw new InternalServerErrorException(error.message);
+      }
+    }
+  }
+
+  async flutterwaveCreateVirtualAccount(
+    flutterwaveCreateVirtualAccountArgs: FlutterwaveCreateVirtualAccountArgs,
+  ) {
+    try {
+      const headers = {
+        Authorization: `Bearer ${FLUTTERWAVE_SK}`,
+      };
+      const payload = {
+        email: flutterwaveCreateVirtualAccountArgs.email,
+        is_permanent: true,
+        bvn: flutterwaveCreateVirtualAccountArgs.bvn,
+        tx_ref: flutterwaveCreateVirtualAccountArgs.reference,
+        narration: flutterwaveCreateVirtualAccountArgs.fullName,
+      };
+
+      const flutterwaveListBanksRequest =
+        this.httpService.post<FlutterwaveCreateVirtualAccountResponse>(
+          `${FLUTTERWAVE_API_URL}/virtual-account-numbers/`,
+          payload,
+          {
+            headers,
+          },
+        );
+      const { data: responseData } = await firstValueFrom(
+        flutterwaveListBanksRequest,
+      );
+
+      return {
+        accountReference: responseData.data.order_ref,
+        accountNumber: responseData.data.account_number,
+        bankName: responseData.data.bank_name,
+      };
     } catch (error) {
       if (error instanceof AxiosError) {
         throw new HttpException(

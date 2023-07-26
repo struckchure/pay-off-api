@@ -17,10 +17,13 @@ import {
   WalletWithdrawalArgs,
 } from "@/modules/wallet/interfaces/wallet.interface";
 import { PaymentClient } from "@/shared/clients/payments";
-import { FlutterwaveInitiateTransferArgs } from "@/shared/clients/payments/flutterwave/interface";
+import {
+  FlutterwaveCreateVirtualAccountArgs,
+  FlutterwaveInitiateTransferArgs,
+} from "@/shared/clients/payments/flutterwave/interface";
 import { PaymentGateway } from "@/shared/clients/payments/interface";
 import { AtomicHelper } from "@/shared/prisma/prisma.utils";
-import { TransactionStatus, TransactionType } from "@prisma/client";
+import { TransactionStatus, TransactionType, Wallet } from "@prisma/client";
 
 @Injectable()
 export class WalletService {
@@ -46,9 +49,30 @@ export class WalletService {
       );
     }
 
-    const wallet = await this.walletDAO.walletGet(walletGetArgs);
+    let wallet: Wallet;
+    wallet = await this.walletDAO.walletGet(walletGetArgs);
     if (!wallet) {
-      return await this.walletDAO.walletCreate({ userId: user.id });
+      wallet = await this.walletDAO.walletCreate({ userId: user.id });
+    }
+
+    if (user.bvn && !wallet.accountNumber) {
+      const virtualAccountPayload: FlutterwaveCreateVirtualAccountArgs = {
+        email: user.email,
+        bvn: user.bvn,
+        reference: crypto.randomBytes(6).toString("hex"),
+        fullName: `${user.firstName} ${user.firstName}`,
+      };
+      const { accountNumber, accountReference, bankName } =
+        await this.paymentClient.createVirtualAccount<FlutterwaveCreateVirtualAccountArgs>(
+          {
+            paymentGateway: PaymentGateway.FLUTTERWAVE,
+            payload: virtualAccountPayload,
+          },
+        );
+      return await this.walletDAO.walletUpdate(
+        { userId: user.id },
+        { accountNumber, accountReference, bankName },
+      );
     }
 
     return wallet;
