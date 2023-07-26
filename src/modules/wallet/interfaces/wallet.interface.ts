@@ -15,6 +15,9 @@ export interface WalletGetArgs {
 }
 
 export interface WalletUpdateArgs {
+  accountNumber?: string;
+  accountReference?: string;
+  bankName?: string;
   balance?: number;
   isActive?: boolean;
 }
