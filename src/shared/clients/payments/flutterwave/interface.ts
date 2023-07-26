@@ -144,3 +144,30 @@ export interface FlutterwaveListBanksResponseData {
   code: string;
   name: string;
 }
+
+export interface FlutterwaveCreateVirtualAccountArgs {
+  email: string;
+  bvn: string;
+  reference: string;
+  fullName: string;
+}
+
+export interface FlutterwaveCreateVirtualAccountResponse {
+  status: string;
+  message: string;
+  data: FlutterwaveCreateVirtualAccountResponseData;
+}
+
+interface FlutterwaveCreateVirtualAccountResponseData {
+  response_code: string;
+  response_message: string;
+  flw_ref: string;
+  order_ref: string;
+  account_number: string;
+  frequency: string;
+  bank_name: string;
+  created_at: string;
+  expiry_date: string;
+  note: string;
+  amount: any;
+}

@@ -6,6 +6,7 @@ import {
   PaymentGateway,
 } from "@/shared/clients/payments/interface";
 import {
+  FlutterwaveCreateVirtualAccountArgs,
   FlutterwaveInitiateTransferArgs,
   FlutterwaveResolveBankAccountArgs,
   FlutterwaveVerifyPaymentArgs,
@@ -73,6 +74,19 @@ export class PaymentClient {
       case PaymentGateway.FLUTTERWAVE:
         return await this.flutterwaveClient.flutterwaveResolveBankAccount(
           resolveBankAccountArgs.payload as FlutterwaveResolveBankAccountArgs,
+        );
+      default:
+        throw new NotImplementedException();
+    }
+  }
+
+  async createVirtualAccount<T = any>(
+    createVirtualAccountArgs: PaymentArgs<T>,
+  ) {
+    switch (createVirtualAccountArgs.paymentGateway) {
+      case PaymentGateway.FLUTTERWAVE:
+        return await this.flutterwaveClient.flutterwaveCreateVirtualAccount(
+          createVirtualAccountArgs.payload as FlutterwaveCreateVirtualAccountArgs,
         );
       default:
         throw new NotImplementedException();
