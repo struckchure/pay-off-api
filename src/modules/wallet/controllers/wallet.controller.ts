@@ -51,9 +51,9 @@ export class WalletController {
     return await this.walletService.walletFund({
       ...walletFundDTO,
       email: request.user.email,
-      redirectUrl: `${request.protocol}://${request.get(
-        "Host",
-      )}/callback/flutterwave/`,
+      redirectUrl:
+        walletFundDTO.redirectUrl ||
+        `${request.protocol}://${request.get("Host")}/callback/flutterwave/`,
     });
   }
 
