@@ -12,7 +12,7 @@ $ yarn
 
 ```bash
 $ docker compose up --force-recreate -d
-$ aws --endpoint-url=http://localhost:4566 s3 mb s3://payoff
+$ docker compose exec localstack awslocal s3api create-bucket --bucket payoff
 ```
 
 ## Running the app
