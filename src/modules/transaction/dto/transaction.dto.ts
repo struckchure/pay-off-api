@@ -1,6 +1,6 @@
 import { IsEnum, IsNumber, IsOptional, IsUUID } from "class-validator";
 
-import { TransactionType } from "@prisma/client";
+import { TransactionStatus, TransactionType } from "@prisma/client";
 
 export class TransactionListDTO {
   @IsNumber()
@@ -18,4 +18,8 @@ export class TransactionListDTO {
   @IsEnum(TransactionType)
   @IsOptional()
   transactionType: TransactionType;
+
+  @IsEnum(TransactionStatus)
+  @IsOptional()
+  transactionStatus: TransactionStatus;
 }

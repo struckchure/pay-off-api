@@ -24,6 +24,8 @@ export class TransactionDAO {
       take: transactionListArgs.take,
       where: removeNullOrEmptyValues<Prisma.TransactionWhereInput>({
         userId: transactionListArgs.userId,
+        transactionType: transactionListArgs.transactionType,
+        transactionStatus: transactionListArgs.transactionStatus,
       }),
     });
   }
