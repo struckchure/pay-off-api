@@ -27,6 +27,9 @@ export class TransactionDAO {
         transactionType: transactionListArgs.transactionType,
         transactionStatus: transactionListArgs.transactionStatus,
       }),
+      orderBy: {
+        createdAt: "desc",
+      },
     });
   }
 
